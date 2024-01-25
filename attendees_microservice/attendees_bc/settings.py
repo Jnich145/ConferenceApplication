@@ -28,12 +28,13 @@ SECRET_KEY = (
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "http://localhost:3000"] # ADD THIS CONTENT!!!!
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "corsheaders", # DON'T TRIP ABOUT THE BLUE LINE, ITS OKAY!!!!
     "django_crontab",
     "attendees.apps.AttendeesConfig",
     "django.contrib.admin",
@@ -51,7 +52,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware", # DON'T TRIP ABOUT THE BLUE LINE, ITS OKAY!!!!
 ]
+
+CORS_ALLOWED_ORIGINS = [ "http://localhost:3001","http://localhost:3000"] # ADD THIS COMMA!!!!
 
 CRONJOBS = [
     ("* * * * *", "attendees.poll.get_conferences"),
