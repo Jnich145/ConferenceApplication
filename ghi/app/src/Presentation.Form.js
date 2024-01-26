@@ -1,42 +1,43 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 
-function PresentationForm () {
-  const [conferences, setConferences] = useState([])
+function PresentationForm() {
+  const [presenterName, setPresenterName] = useState('');
+  const [presenterEmail, setPresenterEmail] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [title, setTitle] = useState('');
+  const [synopsis, setSynopsis] = useState('');
+  const [conference, setConference] = useState('');
 
-  const [presenterName, setPresenterName] = useState("")
-  const [presenterEmail, setPresenterEmail] = useState("")
-  const [companyName, setCompanyName] = useState("")
-  const [title, setTitle] = useState("")
-  const [synopsis, setSynopsis] = useState("")
-  const [conference, setConference] = useState("")
+  const [conferences, setConferences] = useState([]);
 
-  const getData = async () => {
-    const url = 'http://localhost:8000/api/conferences/';
-    const response = await fetch(url);
-
+  const getData = async ()=> {
+    const response = await fetch('http://localhost:8000/api/conferences/');
     if (response.ok) {
-      const data = await response.json();
-      setConferences(data.conferences);
+      const { conferences } = await response.json();
+      setConferences(conferences);
+    } else {
+      console.error('An error occurred fetching the data')
     }
   }
 
   useEffect(()=> {
-    getData();
-  }, [])
+    getData()
+  }, []);
 
-  const handleSubmit = async (event) => {
+  async function handleSubmit(event) {
     event.preventDefault();
+    const data = {
+      presenter_name: presenterName,
+      presenter_email: presenterEmail,
+      company_name: companyName,
+      title,
+      synopsis,
+      conference,
+    };
 
-    const data = {};
-    data.presenter_name = presenterName;
-    data.presenter_email = presenterEmail;
-    data.company_name = companyName;
-    data.title = title;
-    data.synopsis = synopsis;
-    data.conference = conference;
+    const conferenceId = data.conference;
 
-    const url = `http://localhost:8000/api/conferences/${conference}/presentations/`;
-
+    const locationUrl = `http://localhost:8000/api/conferences/${conferenceId}/presentations/`;
     const fetchConfig = {
       method: "post",
       body: JSON.stringify(data),
@@ -44,41 +45,48 @@ function PresentationForm () {
         'Content-Type': 'application/json',
       },
     };
-
-    const response = await fetch(url, fetchConfig);
-
+    
+    const response = await fetch(locationUrl, fetchConfig);
     if (response.ok) {
-      setPresenterName("");
-      setPresenterEmail("");
-      setCompanyName("");
-      setTitle("");
-      setSynopsis("");
-      setConference("");
+      const newConference = await response.json();
+      
+      setPresenterName('');
+      setPresenterEmail('');
+      setCompanyName('');
+      setTitle('');
+      setSynopsis('');
+      setConference('');
     }
   }
 
-  const handlePresenterNameChange = (e) => {
-    setPresenterName(e.target.value);
+  function handlePresenterNameChange(event) {
+    const { value } = event.target;
+    setPresenterName(value);
   }
 
-  const handlePresenterEmailChange = (e) => {
-    setPresenterEmail(e.target.value);
+  function handlePresenterEmailChange(event) {
+    const { value } = event.target;
+    setPresenterEmail(value);
   }
 
-  const handleCompanyNameChange = (e) => {
-    setCompanyName(e.target.value);
+  function handleCompanyNameChange(event) {
+    const { value } = event.target;
+    setCompanyName(value);
   }
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
+  function handleTitleChange(event) {
+    const { value } = event.target;
+    setTitle(value);
   }
 
-  const handleSynopsisChange = (e) => {
-    setSynopsis(e.target.value)
+  function handleSynopsisChange(event) {
+    const { value } = event.target;
+    setSynopsis(value);
   }
 
-  const handleConferenceChange = (e) => {
-    setConference(e.target.value)
+  function handleConferenceChange(event) {
+    const { value } = event.target;
+    setConference(value);
   }
 
   return (
@@ -88,27 +96,27 @@ function PresentationForm () {
           <h1>Create a new presentation</h1>
           <form onSubmit={handleSubmit} id="create-presentation-form">
             <div className="form-floating mb-3">
-              <input onChange={handlePresenterNameChange} value={presenterName} placeholder="Presenter name" required name="presenter_name" className="form-control" />
+              <input onChange={handlePresenterNameChange} value={presenterName} placeholder="Presenter name" required type="text" id="presenter_name" className="form-control" />
               <label htmlFor="presenter_name">Presenter name</label>
             </div>
             <div className="form-floating mb-3">
-              <input onChange={handlePresenterEmailChange} value={presenterEmail} placeholder="Presenter email" required name="presenter_email" type="email" id="presenter_email" className="form-control" />
+              <input onChange={handlePresenterEmailChange} value={presenterEmail} placeholder="Presenter email" required type="email" id="presenter_email" className="form-control" />
               <label htmlFor="presenter_email">Presenter email</label>
             </div>
             <div className="form-floating mb-3">
-              <input onChange={handleCompanyNameChange} value={companyName} placeholder="Company name" type="text" name="company_name" id="company_name" className="form-control" />
+              <input onChange={handleCompanyNameChange} value={companyName} placeholder="Company name" type="text" id="company_name" className="form-control" />
               <label htmlFor="company_name">Company name</label>
             </div>
             <div className="form-floating mb-3">
-              <input onChange={handleTitleChange} value={title} placeholder="Title" required name="title" type="text" id="title" className="form-control" />
+              <input onChange={handleTitleChange} value={title} placeholder="Title" required type="text" id="title" className="form-control" />
               <label htmlFor="title">Title</label>
             </div>
             <div className="mb-3">
               <label htmlFor="synopsis">Synopsis</label>
-              <textarea onChange={handleSynopsisChange} value={synopsis} id="synopsis" name="synopsis" className="form-control" rows="3" ></textarea>
+              <textarea onChange={handleSynopsisChange} value={synopsis} id="synopsis" className="form-control" rows="3" ></textarea>
             </div>
             <div className="mb-3">
-              <select onChange={handleConferenceChange} value={conference} required name="conference" className="form-select" id="conference">
+              <select onChange={handleConferenceChange} value={conference} required className="form-select" id="conference">
                 <option value="">Choose a conference</option>
                 {conferences.map(conference => {
                   return (
@@ -126,4 +134,3 @@ function PresentationForm () {
 }
 
 export default PresentationForm;
-
